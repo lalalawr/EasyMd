@@ -1,0 +1,11 @@
+{
+  "appId": "app.easymd.reader",
+  "appName": "EasyMd",
+  "webDir": "dist",
+  "server": {
+    "iosScheme": "easymd"
+  },
+  "ios": {
+    "contentInset": "always"
+  }
+}
