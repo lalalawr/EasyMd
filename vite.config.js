@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  base: "/easy-md/",
   plugins: [
     react(),
     VitePWA({
@@ -14,8 +15,8 @@ export default defineConfig({
         short_name: "EasyMd",
         description: "安静、舒适的 Markdown 阅读与文件管理工具",
         lang: "zh-CN",
-        start_url: "/",
-        scope: "/",
+        start_url: "/easy-md/",
+        scope: "/easy-md/",
         display: "standalone",
         orientation: "portrait",
         background_color: "#FAF9F6",
