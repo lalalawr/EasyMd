@@ -88,7 +88,6 @@ export default function DocRow({
         <div className="ink-row-main">
           <div className="ink-row-title">
             {highlight ? parseInline(doc.title, highlight) : doc.title}
-            {doc.favorite && <Star size={13} className="ink-row-star" fill="currentColor" />}
           </div>
           {snippet && <div className="ink-row-snippet">{snippet}</div>}
           <div className="ink-row-meta">
@@ -111,14 +110,22 @@ export default function DocRow({
           )}
         </div>
         {!selectionMode && (
-          <MoreHorizontal
-            size={18}
-            className="ink-row-more"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLongPress();
-            }}
-          />
+          <div className="ink-row-side">
+            <button
+              className={"ink-fav-toggle" + (doc.favorite ? " on" : "")}
+              onClick={(e) => { e.stopPropagation(); onFav(); }}
+              aria-label={doc.favorite ? "取消收藏" : "收藏"}
+            >
+              <Star size={18} fill={doc.favorite ? "currentColor" : "none"} />
+            </button>
+            <button
+              className="ink-row-more-btn"
+              onClick={(e) => { e.stopPropagation(); onLongPress(); }}
+              aria-label="更多"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+          </div>
         )}
       </div>
     </div>

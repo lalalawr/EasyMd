@@ -264,3 +264,9 @@ input, button { font-family: inherit; }
 .ink-toolbar button { flex-shrink: 0; width: 38px; height: 36px; display: flex; align-items: center; justify-content: center; border: none; background: none; color: var(--text-2); border-radius: 9px; cursor: pointer; }
 .ink-toolbar button:active { background: var(--surface-2); color: var(--text); }
 .ink-textarea { flex: 1; width: 100%; border: none; outline: none; resize: none; background: var(--bg); color: var(--text); padding: 16px 20px calc(24px + env(safe-area-inset-bottom)); font-family: ui-monospace, "SF Mono", Menlo, "PingFang SC", monospace; font-size: 15px; line-height: 1.7; -webkit-overflow-scrolling: touch; }
+
+/* 修复：常驻可点的收藏星标（替代仅靠左滑/长按） */
+.ink-row-side { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; margin-top: 1px; }
+.ink-fav-toggle, .ink-row-more-btn { border: none; background: none; padding: 3px; cursor: pointer; color: var(--text-3); display: flex; border-radius: 8px; transition: color .15s, background .15s; }
+.ink-fav-toggle:active, .ink-row-more-btn:active { background: var(--surface-2); }
+.ink-fav-toggle.on { color: var(--star); }
