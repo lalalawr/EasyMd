@@ -25,92 +25,41 @@ npm run build      # 产物在 dist/
 npm run preview    # 本地预览构建产物
 ```
 
-PWA 的安装与离线能力需要 **HTTPS**（`localhost` 也可），因此建议部署到下面任一平台。
+PWA 的安装与离线能力需要 **HTTPS**（`localhost` 也可）。本工程**已为 GitHub Pages 预配置完毕**：`vite.config.js` 的 `base` 已设为 `/EasyMd/`，PWA manifest 的 `start_url`/`scope` 一并对齐，且自带 `.github/workflows/deploy.yml` 自动部署工作流。你只需把仓库命名为 **EasyMd** 推上去并开启 Pages 即可。
 
-### 方式一：部署到 Vercel（最简单，根路径，PWA 开箱即用）
+### 一、推送到 GitHub
 
-1. 把项目推到 GitHub（见下方「推送到 GitHub」）。
-2. 打开 [vercel.com](https://vercel.com) → 用 GitHub 登录 → **Add New… → Project** → 选中你的仓库 **Import**。
-3. Vercel 会自动识别为 Vite 项目，确认以下配置（通常已自动填好）：
-   - Framework Preset：`Vite`
-   - Build Command：`npm run build`
-   - Output Directory：`dist`
-4. 点 **Deploy**，约一分钟后得到 `https://<项目名>.vercel.app`。
-5. 用 iPhone Safari 打开该网址 → 分享 → 添加到主屏幕，即为可离线的全屏 App。之后每次 `git push` 都会自动重新部署。
-
-> 也可用命令行：`npm i -g vercel && vercel`（首次按提示登录与确认），生产部署用 `vercel --prod`。
-
-### 方式二：部署到 GitHub Pages（免费，但部署在子路径，需改两处配置）
-
-GitHub Pages 项目站点的地址是 `https://<用户名>.github.io/<仓库名>/`，处于**子路径**，因此需要：
-
-1. 在 `vite.config.js` 里设置 `base` 为 `/<仓库名>/`（仓库名替换成你的实际名字，注意首尾斜杠）：
-
-   ```js
-   export default defineConfig({
-     base: "/easy-md/",
-     plugins: [ /* ... 保持不变 ... */ ],
-   });
-   ```
-
-2. 同步把 `vite.config.js` 中 PWA manifest 的 `start_url` 与 `scope` 改成同样的子路径，否则安装后打不开：
-
-   ```js
-   manifest: {
-     // ...
-     start_url: "/easy-md/",
-     scope: "/easy-md/",
-   }
-   ```
-
-3. 在仓库里新增 GitHub Actions 工作流 `.github/workflows/deploy.yml`：
-
-   ```yaml
-   name: Deploy to GitHub Pages
-   on:
-     push:
-       branches: [main]
-   permissions:
-     contents: read
-     pages: write
-     id-token: write
-   jobs:
-     build:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v4
-         - uses: actions/setup-node@v4
-           with: { node-version: 20, cache: npm }
-         - run: npm ci
-         - run: npm run build
-         - uses: actions/upload-pages-artifact@v3
-           with: { path: dist }
-     deploy:
-       needs: build
-       runs-on: ubuntu-latest
-       environment:
-         name: github-pages
-         url: ${{ steps.deployment.outputs.page_url }}
-       steps:
-         - id: deployment
-           uses: actions/deploy-pages@v4
-   ```
-
-4. 仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。
-5. `git push` 到 `main` 后，Actions 自动构建并发布，地址为 `https://<用户名>.github.io/<仓库名>/`。
-
-> 如果用项目根路径的自定义域名或 `<用户名>.github.io` 这种用户站点（根路径），则 `base` 用 `"/"`，manifest 也保持 `"/"`，无需上面的子路径改动。
-
-### 推送到 GitHub
+在项目根目录执行（把 `<你的用户名>` 换成你的 GitHub 用户名）：
 
 ```bash
 git init
 git add .
 git commit -m "EasyMd: Markdown reader"
 git branch -M main
-git remote add origin https://github.com/<你的用户名>/<仓库名>.git
+git remote add origin https://github.com/<你的用户名>/EasyMd.git
 git push -u origin main
 ```
+
+> 仓库名必须是 **EasyMd**（大小写一致），否则与 `base: "/EasyMd/"` 不匹配，页面会白屏。
+> 若仓库还不存在，先到 GitHub 点 **New repository** 建一个名为 `EasyMd` 的空仓库（不要勾选自动生成 README，以免与本地冲突）。
+
+### 二、开启 GitHub Pages
+
+1. 打开仓库 → **Settings → Pages**。
+2. **Build and deployment → Source** 选择 **GitHub Actions**。
+3. 完成。每次 `git push` 到 `main`，`.github/workflows/deploy.yml` 会自动构建并发布。
+
+首次推送后到仓库 **Actions** 标签可看到部署进度；约 1–2 分钟后，访问地址为：
+
+```
+https://<你的用户名>.github.io/EasyMd/
+```
+
+用 iPhone Safari 打开该地址 → 分享 → 添加到主屏幕，即为可离线的全屏 App。
+
+### 备选：部署到 Vercel（根路径）
+
+如果改用 Vercel/Netlify 或根路径自定义域名，需要把子路径配置改回根路径：把 `vite.config.js` 里的 `const base = "/EasyMd/"` 改为 `const base = "/"`（manifest 的 `start_url`/`scope` 会随之变为 `/`）。然后在 [vercel.com](https://vercel.com) 用 GitHub 登录 → Add New… → Project → 选中仓库 Import，框架自动识别为 Vite（Build：`npm run build`，Output：`dist`）→ Deploy。
 
 ## 功能
 
@@ -123,9 +72,9 @@ git push -u origin main
 
 ## 数据与持久化
 
-所有数据保存在浏览器 **IndexedDB**（库名 `easymd`，对象仓库 `documents` / `folders` / `tags` / `settings`）。首次启动会写入演示用种子数据；之后导入、编辑、整理均会持久化，刷新不丢失。封装见 `src/db/idb.js`。
+所有数据保存在浏览器 **IndexedDB**（库名 `inkwell`，对象仓库 `documents` / `folders` / `tags` / `settings`）。首次启动会写入演示用种子数据；之后导入、编辑、整理均会持久化，刷新不丢失。封装见 `src/db/idb.js`。
 
-> 清空数据：在浏览器开发者工具 Application → IndexedDB 中删除 `easymd` 库即可恢复到初始种子数据。
+> 清空数据：在浏览器开发者工具 Application → IndexedDB 中删除 `inkwell` 库即可恢复到初始种子数据。
 
 ## 在 iPhone 上导入文件
 
@@ -136,7 +85,7 @@ git push -u origin main
 ## 目录结构
 
 ```
-easy-md/
+inkwell/
 ├── index.html
 ├── vite.config.js          # Vite + PWA 配置（manifest 在此）
 ├── capacitor.config.json   # 壳化为原生 App 的配置脚手架
@@ -174,7 +123,7 @@ easy-md/
 ## 仍可继续扩展
 
 - **拖拽整理**：当前文件夹间移动走长按菜单 / 批量条，可再接入 `@dnd-kit` 实现触摸拖拽。
-- **Capacitor 壳化为原生 App**：工程已含 `capacitor.config.json`。安装 `@capacitor/core @capacitor/cli`，`npx cap add ios`，`npm run build && npx cap copy`，用 Xcode 运行；再接入 `@capacitor/filesystem` 与 share-extension 插件实现 Document Picker、「用 EasyMd 打开」与 iCloud 同步。UI 与业务代码完全复用现有这套。
+- **Capacitor 壳化为原生 App**：工程已含 `capacitor.config.json`。安装 `@capacitor/core @capacitor/cli`，`npx cap add ios`，`npm run build && npx cap copy`，用 Xcode 运行；再接入 `@capacitor/filesystem` 与 share-extension 插件实现 Document Picker、「用 Inkwell 打开」与 iCloud 同步。UI 与业务代码完全复用现有这套。
 
 ## 说明
 
